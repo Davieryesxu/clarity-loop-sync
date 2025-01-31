@@ -52,7 +52,7 @@ Clarinet.test({
 });
 
 Clarinet.test({
-  name: "Ensure can sync asset",
+  name: "Ensure can sync asset and update status",
   async fn(chain: Chain, accounts: Map<string, Account>) {
     const deployer = accounts.get("deployer")!;
     const assetId = 1;
@@ -69,7 +69,7 @@ Clarinet.test({
     ]);
     
     // Then sync
-    let block = chain.mineBlock([
+    let syncBlock = chain.mineBlock([
       Tx.contractCall(
         "loop-sync", 
         "sync-asset",
@@ -78,6 +78,18 @@ Clarinet.test({
       )
     ]);
     
-    assertEquals(block.receipts[0].result, '(ok true)');
+    assertEquals(syncBlock.receipts[0].result, '(ok true)');
+
+    // Update sync status
+    let updateBlock = chain.mineBlock([
+      Tx.contractCall(
+        "loop-sync",
+        "update-sync-status",
+        [types.uint(assetId), types.uint(chainId), types.ascii("COMPLETED")],
+        deployer.address
+      )
+    ]);
+
+    assertEquals(updateBlock.receipts[0].result, '(ok true)');
   }
 });
