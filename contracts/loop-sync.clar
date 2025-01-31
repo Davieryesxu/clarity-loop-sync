@@ -6,6 +6,7 @@
 (define-constant err-already-registered (err u101))
 (define-constant err-not-found (err u102))
 (define-constant err-locked (err u103))
+(define-constant err-invalid-status (err u104))
 
 ;; Data Variables
 (define-data-var sync-fee uint u100)
@@ -55,6 +56,23 @@
     (map-set sync-records
       { asset-id: asset-id, chain-id: target-chain }
       { timestamp: (default-to u0 current-time), status: "SYNCING" }
+    )
+    
+    (ok true)
+  )
+)
+
+(define-public (update-sync-status (asset-id uint) (chain-id uint) (new-status (string-ascii 24)))
+  (let (
+    (asset (unwrap! (get-asset-by-id asset-id) err-not-found))
+    (current-time (get-block-info? time (- block-height u1)))
+  )
+    (asserts! (is-eq tx-sender contract-owner) err-unauthorized)
+    (asserts! (or (is-eq new-status "COMPLETED") (is-eq new-status "FAILED")) err-invalid-status)
+    
+    (map-set sync-records
+      { asset-id: asset-id, chain-id: chain-id }
+      { timestamp: (default-to u0 current-time), status: new-status }
     )
     
     (ok true)
