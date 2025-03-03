@@ -9,14 +9,16 @@ A Clarity smart contract system for syncing and managing tokenized assets across
 - Asset ownership tracking
 - Sync status management (SYNCING, COMPLETED, FAILED)
 - Contract pause functionality for emergency situations
-- Rate limiting for sync operations
-- Event emission for important state changes
+- Configurable rate limiting for sync operations
+- Enhanced event emission for better tracking
+- Asset version history tracking
+- Improved metadata validation with JSON structure checking
 
 ## Recent Enhancements
-- Added contract pause functionality
-- Implemented rate limiting for sync operations
-- Added event emissions for better tracking
-- Enhanced error handling and input validation
-- Added metadata versioning
+- Added asset version history tracking
+- Implemented configurable rate limiting
+- Enhanced event emission system
+- Strengthened metadata validation with JSON checking
+- Added getter functions for better contract interaction
 
 [Previous content...]
