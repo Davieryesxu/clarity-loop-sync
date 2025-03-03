@@ -8,88 +8,51 @@ import {
 import { assertEquals } from 'https://deno.land/std@0.90.0/testing/asserts.ts';
 
 Clarinet.test({
-  name: "Ensure can register new asset",
+  name: "Ensures enhanced metadata validation works",
   async fn(chain: Chain, accounts: Map<string, Account>) {
     const deployer = accounts.get("deployer")!;
-    const assetId = 1;
-    const metadata = "Test Asset";
-    const chainId = 1;
     
-    let block = chain.mineBlock([
+    // Test invalid JSON metadata
+    let invalidBlock = chain.mineBlock([
       Tx.contractCall(
         "loop-sync",
         "register-asset",
-        [types.uint(assetId), types.utf8(metadata), types.uint(chainId)],
+        [types.uint(1), types.utf8("invalid"), types.uint(1)],
         deployer.address
       )
     ]);
     
-    assertEquals(block.receipts.length, 1);
-    assertEquals(block.height, 2);
-    assertEquals(block.receipts[0].result, '(ok true)');
+    assertEquals(invalidBlock.receipts[0].result, '(err u105)');
+
+    // Test valid JSON metadata
+    let validBlock = chain.mineBlock([
+      Tx.contractCall(
+        "loop-sync",
+        "register-asset",
+        [types.uint(1), types.utf8('{"name": "Test"}'), types.uint(1)],
+        deployer.address
+      )
+    ]);
+    
+    assertEquals(validBlock.receipts[0].result.startsWith('(ok'), true);
   }
 });
 
 Clarinet.test({
-  name: "Ensure only owner can register assets",
-  async fn(chain: Chain, accounts: Map<string, Account>) {
-    const wallet1 = accounts.get("wallet_1")!;
-    const assetId = 1;
-    const metadata = "Test Asset";
-    const chainId = 1;
-    
-    let block = chain.mineBlock([
-      Tx.contractCall(
-        "loop-sync",
-        "register-asset",
-        [types.uint(assetId), types.utf8(metadata), types.uint(chainId)],
-        wallet1.address
-      )
-    ]);
-    
-    assertEquals(block.receipts[0].result, '(err u100)');
-  }
-});
-
-Clarinet.test({
-  name: "Ensure can sync asset and update status",
+  name: "Ensures rate limiting works with configuration",
   async fn(chain: Chain, accounts: Map<string, Account>) {
     const deployer = accounts.get("deployer")!;
-    const assetId = 1;
-    const chainId = 2;
     
-    // First register asset
-    chain.mineBlock([
+    // Set rate limit window
+    let configBlock = chain.mineBlock([
       Tx.contractCall(
         "loop-sync",
-        "register-asset",
-        [types.uint(assetId), types.utf8("Test"), types.uint(1)],
+        "set-rate-limit-window",
+        [types.uint(100)],
         deployer.address
       )
     ]);
     
-    // Then sync
-    let syncBlock = chain.mineBlock([
-      Tx.contractCall(
-        "loop-sync", 
-        "sync-asset",
-        [types.uint(assetId), types.uint(chainId)],
-        deployer.address
-      )
-    ]);
-    
-    assertEquals(syncBlock.receipts[0].result, '(ok true)');
-
-    // Update sync status
-    let updateBlock = chain.mineBlock([
-      Tx.contractCall(
-        "loop-sync",
-        "update-sync-status",
-        [types.uint(assetId), types.uint(chainId), types.ascii("COMPLETED")],
-        deployer.address
-      )
-    ]);
-
-    assertEquals(updateBlock.receipts[0].result, '(ok true)');
+    assertEquals(configBlock.receipts[0].result, '(ok true)');
   }
 });

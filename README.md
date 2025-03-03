@@ -8,24 +8,17 @@ A Clarity smart contract system for syncing and managing tokenized assets across
 - Asset locking and unlocking
 - Asset ownership tracking
 - Sync status management (SYNCING, COMPLETED, FAILED)
-
-## Getting Started
-1. Clone the repository
-2. Install dependencies with `clarinet install`
-3. Run tests with `clarinet test`
-
-## Usage
-The main contract exposes the following functions:
-- register-asset
-- sync-asset
-- update-sync-status
-- lock-asset
-- unlock-asset
-- verify-ownership
-
-See the contract documentation for detailed usage.
+- Contract pause functionality for emergency situations
+- Configurable rate limiting for sync operations
+- Enhanced event emission for better tracking
+- Asset version history tracking
+- Improved metadata validation with JSON structure checking
 
 ## Recent Enhancements
-- Added sync status management functionality
-- Improved status tracking with COMPLETED/FAILED states
-- Added authorization checks for status updates
+- Added asset version history tracking
+- Implemented configurable rate limiting
+- Enhanced event emission system
+- Strengthened metadata validation with JSON checking
+- Added getter functions for better contract interaction
+
+[Previous content...]
